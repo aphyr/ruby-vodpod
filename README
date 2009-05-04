@@ -1,4 +1,72 @@
 Vodpod - Ruby bindings for the Vodpod API.
 ==========================================
 
-Todo: be awesome.
+Vodpod is a web site that allows you to collect videos. This library lets you
+interact with those collections and videos over their REST-style API, using
+clean Ruby. Typically one interacts with the Vodpod API through javascript, but
+maybe you've got bigger plans. Maybe you want to integrate with a content
+management system, or copy videos automatically from a social bookmarking site.
+Be creative. :-)
+
+Right now you can search for videos across the site and in a specific pod, retrieve details on videos and pods, and page through videos in a pod. You can also post new videos to a pod, and update video attributes. Error handling is spotty thus far.
+
+Examples
+--------
+
+Vodpod.start(:api_key => '...', :auth => '...') do |v|
+  # Get a pod
+  pod = v.pod('aphyr')
+
+  # Basic information about a pod is loaded by default
+  pod.name   # => "aphyr's videos" 
+  pod.stats  # => {"total_views"=>23, "weekly_pod_views"=>2, ...}
+
+  # Retrieve tags (also works on videos)
+  pod.tags   # => [<Vodpod::Tag neotokyo (1)>, <Vodpod::Tag game (1)>, ...]
+
+  # Look at who's following this pod
+  pod.followers  # => [<Vodpod::User foo>, <Vodpod::User bar>, ...]
+
+  # Get a full dump of an object's contents (works on Tags, Users, Videos, ...)
+  pod.store      # => {"name"=>"aphyr's videos", "created_at" => ...}
+
+  # List some videos
+  pod.videos.map { |video| video.title }
+  # => ["Official Neotokyo Trailer", "Kittens Attack!"]
+
+  # You can page through results and filter by tags
+  pod.videos(:tags => 'music', :page => 2, :per_page => 16)
+  # => [<Vodpod::Video ...>, <Vodpod::Video ...>, ...]
+
+  # Find videos by searching (Also works on pods)
+  v.search('obama', :per_page => 48)
+  # => [<Vodpod::Video ...>, <Vodpod::Video ...>, ...]
+
+  # Get a specific video by ID
+  vid = v.video(1063027)   # => <Vodpod::Video ...>
+  
+  # Show the associated user
+  vid.user                 # => <Vodpod::User scarrfase>
+
+  # Post a new video to a pod. Returns the new video.
+  pod.post('http://www.youtube.com/watch?v=E0ewUBTSlvQ',
+    :title => 'Neotokyo Recon Demo',
+    :description => 'Demo footage of the in-development Neotokyo mod',
+    :tags => ['game', 'neotokyo', 'trailer']
+  )
+  # => <Vodpod::Video ...>
+
+  # Add a tag "sports" to every video in a pod about frisbee.
+  pod.search('frisbee').each do |video|
+    tags = "#{video.tags} sports"
+    video.update(:tags => tags)
+  end
+end
+
+Roadmap
+-------
+
+- Posting videos seems to work--the URL is correct in the returned video JSON, but visiting the page doesn't seem to load. Perhaps a caching issue on Vodpod's end?
+- Automatic casting for datetimes.
+- Better error handling
+- Iterators for acting on all results without thinking about pagination

@@ -3,11 +3,16 @@ module Vodpod
   class Record
     attr_accessor :store
 
+    # Like Record.new, but also calls load!
+    def self.load(*params)
+      record = new(*params)
+      record.load! if record.respond_to? :load!
+      record
+    end
+
     def initialize(connection, params = {})
       @connection = connection
       @store = params
-
-      self.load!
     end
 
     # Pass requests to store by default.

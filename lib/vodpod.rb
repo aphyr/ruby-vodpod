@@ -15,6 +15,7 @@ module Vodpod
   require "#{ROOT}/vodpod/error"
   require "#{ROOT}/vodpod/connection"
   require "#{ROOT}/vodpod/record"
+  require "#{ROOT}/vodpod/user"
   require "#{ROOT}/vodpod/tag"
   require "#{ROOT}/vodpod/pod"
   require "#{ROOT}/vodpod/video"

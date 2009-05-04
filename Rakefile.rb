@@ -23,7 +23,7 @@ vodpod_gemspec = Gem::Specification.new do |s|
   s.summary = 'Ruby bindings for the Vodpod API.'
  
   s.files = FileList['{lib}/**/*', '{example}/**/*', 'LICENSE', 'README'].to_a
-  s.executables = ['']
+  s.executables = []
   s.require_path = 'lib'
   s.has_rdoc = true
  

@@ -1,4 +1,4 @@
-module CortexReaver
+module Vodpod
   APP_NAME = 'Vodpod'
   APP_VERSION = '0.0.1'
   APP_AUTHOR = 'Kyle Kingsbury'

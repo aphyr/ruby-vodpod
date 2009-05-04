@@ -12,6 +12,7 @@ module Vodpod
   ROOT = File.dirname(__FILE__)
 
   # Load library
+  require "#{ROOT}/vodpod/version"
   require "#{ROOT}/vodpod/error"
   require "#{ROOT}/vodpod/connection"
   require "#{ROOT}/vodpod/record"

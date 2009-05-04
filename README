@@ -8,7 +8,10 @@ maybe you've got bigger plans. Maybe you want to integrate with a content
 management system, or copy videos automatically from a social bookmarking site.
 Be creative. :-)
 
-Right now you can search for videos across the site and in a specific pod, retrieve details on videos and pods, and page through videos in a pod. You can also post new videos to a pod, and update video attributes. Error handling is spotty thus far.
+Right now you can search for videos across the site and in a specific pod,
+retrieve details on videos and pods, and page through videos in a pod. You can
+also post new videos to a pod, and update video attributes. Error handling is
+spotty thus far.
 
 Examples
 --------
@@ -66,7 +69,9 @@ end
 Roadmap
 -------
 
-- Posting videos seems to work--the URL is correct in the returned video JSON, but visiting the page doesn't seem to load. Perhaps a caching issue on Vodpod's end?
+- Posting videos seems to work--the URL is correct in the returned video JSON,
+  but visiting the page doesn't seem to load. Perhaps a caching issue on
+  Vodpod's end?
 - Automatic casting for datetimes.
 - Better error handling
 - Iterators for acting on all results without thinking about pagination

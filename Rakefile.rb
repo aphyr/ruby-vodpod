@@ -42,6 +42,9 @@ Rake::RDocTask.new do |rd|
   rd.rdoc_dir = 'doc'
  
   rd.rdoc_files.include('lib/**/*.rb')
+  rd.rdoc_files.include('README')
+  rd.rdoc_files.include('LICENSE')
+  rd.rdoc_files.include('HISTORY')
 end
  
 desc "install Vodpod"

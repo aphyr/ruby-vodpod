@@ -1,4 +1,5 @@
 module Vodpod
+  # A Vodpod user, associated with a pod and with videos.
   class User < Record
     # Returns recent activity by people related to this user. Not working
     # yet--maybe a Vodpod bug?

@@ -31,7 +31,8 @@ module Vodpod
 
     # Perform a JSON request to the Vodpod API for a given path and parameter
     # hash. Returns a parsed JSON document. Automatically provides api_key and
-    # auth params if you do not specify them.
+    # auth params if you do not specify them. Method should be one of :get or
+    # :post--you should use the #get or #post methods for convenience.
     def request(method, path, params = {})
       defaults = {
         :api_key => @api_key,

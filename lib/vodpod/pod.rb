@@ -43,7 +43,7 @@ module Vodpod
       end
     end
 
-    # Actually loads information for this pod.
+    # Loads information for this pod from the API.
     def load!
       if pod_id
         @store.merge! @connection.get('pod/details', :pod_id => pod_id)["pod"]
@@ -51,10 +51,11 @@ module Vodpod
     end
 
     # Posts a new video to a pod. Returns the video posted.
+    # 
     # Optional parameters:
-    # :title       => 'Cats with captions!'
-    # :description => 'Ahh the internet...'
-    # :tags        => 'foo bar baz' or ['foo', 'bar', 'baz']
+    #   :title       => 'Cats with captions!'
+    #   :description => 'Ahh the internet...'
+    #   :tags        => 'foo bar baz' or ['foo', 'bar', 'baz']
     def post(url, params = {})
       new_params = params.merge(
         :pod_id => @store['pod_id'],

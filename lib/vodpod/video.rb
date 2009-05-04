@@ -1,5 +1,5 @@
 module Vodpod
-  # A video
+  # A video.
   class Video < Record
     # Loads information on this video by video_id
     def load!

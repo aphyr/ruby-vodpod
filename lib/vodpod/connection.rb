@@ -1,7 +1,6 @@
 module Vodpod
   # Connection to vodpod.com; retreives JSON data and handles API key/auth.
   class Connection
-
     attr_accessor :api
     attr_accessor :auth
 
@@ -19,9 +18,20 @@ module Vodpod
       request :get, *args
     end
  
+    # Returns the user associated with this API key.
+    def me
+      User.new self, get(:me)
+    end
+
     # Request via POST
     def post(*args)
       request :post, *args
+    end
+
+    # Pings the API with our API key to check whether or not we are ready to
+    # make requests.
+    def ready?
+      get or false
     end
 
     # Perform a JSON request to the Vodpod API for a given path and parameter

@@ -7,27 +7,20 @@ module Vodpod
   # Records are instantiated with a connection object and a default store of an
   # empty hash. 
   class Record
-    attr_accessor :store
-
-    # Like Record.new, but also calls load!
-    def self.load(*params)
-      record = new(*params)
-      record.load! if record.respond_to? :load!
-      record
-    end
+    attr_accessor :values
 
     # Create a new Record. Takes two parameters: a Connection object so the
     # record can perform further requests, and an optional default value for
-    # the store. 
-    def initialize(connection, store = {})
+    # the value hash
+    def initialize(connection, values = {})
       @connection = connection
-      @store = store
+      @values = values
     end
 
     # Pass requests to store by default.
     def method_missing(meth, *args)
-      if @store.include? meth.to_s
-        @store[meth.to_s]
+      if @values.include? meth.to_s
+        @values[meth.to_s]
       end
     end
   end

@@ -15,13 +15,13 @@ module Vodpod
     end
 
     # Request via GET
-    def get(*paths, params = {})
-      request :get, *paths, params
+    def get(*args)
+      request :get, *args
     end
  
     # Request via POST
-    def post(*paths, params = {})
-      request :post, *paths, params
+    def post(*args)
+      request :post, *args
     end
 
     # Perform a JSON request to the Vodpod API for a given path and parameter
@@ -32,15 +32,19 @@ module Vodpod
     #
     # Example
     #   request :get, :users, :aphyr, :include => [:name]
-    def request(method, *paths, params = {})
+    def request(method, *args)
       defaults = {
         :api_key => @api_key,
         :auth => @auth
       }
 
-      # Join path fragments
-      path = Vodpod::BASE_URI + paths.map{|e| Vodpod::escape(e)}.join('/') + '.json'
-      
+      # Get parameters
+      if args.last.kind_of? Hash
+        params = args.pop
+      else
+        params = {}
+      end
+
       # Construct query fragment
       query = defaults.merge(params).inject('?') { |s, (k, v)|
         if v.kind_of? Array
@@ -48,6 +52,9 @@ module Vodpod
         end
         s << "#{Vodpod::escape(k)}=#{Vodpod::escape(v)}&"
       }[0..-2]
+
+      # Join path fragments
+      path = Vodpod::BASE_URI + args.map{|e| Vodpod::escape(e)}.join('/') + '.json'
 
       begin
         # Get URI
@@ -77,7 +84,13 @@ module Vodpod
         raise Error, "server returned invalid json: #{e.message}" + "\n\n" + res
       end
 
-      data
+      # Check for errors
+      if data[0].false?
+        raise Error, data[1]['message']
+      end
+
+      # Return data section
+      data[1]
     end
   end
 end

@@ -18,7 +18,7 @@ module Vodpod
   require "#{ROOT}/vodpod/record"
   require "#{ROOT}/vodpod/user"
   require "#{ROOT}/vodpod/tag"
-  require "#{ROOT}/vodpod/pod"
+  require "#{ROOT}/vodpod/collection"
   require "#{ROOT}/vodpod/video"
 
   # Performs URI escaping so that you can construct proper

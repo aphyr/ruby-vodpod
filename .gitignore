@@ -1,4 +1,6 @@
 db/
+doc/
+example/
 pkg/
 log/
 ._*

@@ -1,6 +1,7 @@
 module Vodpod
   # Connection to vodpod.com; retreives JSON data and handles API key/auth.
   class Connection
+    TIMEOUT = 5
     attr_accessor :api
     attr_accessor :auth
 
@@ -8,9 +9,11 @@ module Vodpod
     #
     # :api_key => API key
     # :auth_key => Auth key
+    # :timeout => How many seconds to wait before giving up on API calls.
     def initialize(params = {})
       @api_key = params[:api_key]
       @auth_key = params[:auth_key]
+      @timeout = params[:timeout] || TIMEOUT
     end
 
     # Request via GET
@@ -72,12 +75,18 @@ module Vodpod
         when :get
           # GET request
           uri = URI.parse(path + query)
-          res = Net::HTTP.get(uri)
+          res = Net::HTTP.start(uri.host, uri.port) do |http|
+            http.open_timeout = @timeout
+            http.read_timeout = @timeout
+            http.get(uri.path + query)
+          end
         when :post
           # POST request
           uri = URI.parse(path)
           res = Net::HTTP.start(uri.host, uri.port) do |http|
-            http.post(uri.path, query[1..-1]).body
+            http.open_timeout = @timeout
+            http.read_timeout = @timeout
+            http.post(uri.path, query[1..-1])
           end
         else
           # Don't know how to do that kind of request
@@ -89,7 +98,7 @@ module Vodpod
 
       # Parse response as JSON
       begin
-        data = JSON.parse res
+        data = JSON.parse res.body
       rescue => e
         raise Error, "server returned invalid json: #{e.message}" + "\n\n" + res
       end

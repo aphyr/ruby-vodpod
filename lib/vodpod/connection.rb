@@ -19,8 +19,8 @@ module Vodpod
     end
  
     # Returns the user associated with this API key.
-    def me
-      User.new self, get(:me)
+    def me(*args)
+      User.new self, get(:me, *args)
     end
 
     # Request via POST
@@ -45,7 +45,7 @@ module Vodpod
     def request(method, *args)
       defaults = {
         :api_key => @api_key,
-        :auth => @auth
+        :auth_key => @auth
       }
 
       # Get parameters

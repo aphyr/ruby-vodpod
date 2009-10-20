@@ -1,5 +1,5 @@
 module Vodpod
-  # Represents a pod.
-  class Pod < Record
+  # A collection of videos.
+  class Collection < Record
   end
 end

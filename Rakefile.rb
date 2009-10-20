@@ -29,7 +29,7 @@ vodpod_gemspec = Gem::Specification.new do |s|
  
   s.required_ruby_version = '>= 1.8.5'
  
-  s.add_dependency('json', '~> 1.1.4')
+  s.add_dependency('json', '~> 1.1.9')
 end
  
 Rake::GemPackageTask.new(vodpod_gemspec) do |p|

@@ -8,7 +8,7 @@ require 'uri'
 require 'net/http'
 
 module Vodpod
-  BASE_URI = 'http://api.vodpod.com/api/'
+  BASE_URI = 'http://api.vodpod.com/v2/'
   ROOT = File.dirname(__FILE__)
 
   # Load library
@@ -32,13 +32,15 @@ module Vodpod
   module_function :escape
 
   # Creates a connection with the provided parameter hash, and yields it in a
-  # block. Example:
+  # block if given. Returns the connection. Example:
   #
   #   Vodpod.start(:api_key => api_key, :auth => auth) do |v|
   #     pod = v.pod('aphyr')
   #     p pod.created_at
   #   end
   def self.start(params)
-    yield Connection.new(params) 
+    c = Connection.new params
+    yield c if block_given?
+    c 
   end
 end

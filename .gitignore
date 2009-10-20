@@ -1,8 +1,9 @@
 db/
 pkg/
-doc/
+log/
 ._*
+.*.swp
 *~
 .DS_Store
-error.log
-example/test.rb
+*.gemspec
+*.pid

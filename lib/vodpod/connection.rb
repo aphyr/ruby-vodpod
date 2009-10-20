@@ -8,10 +8,10 @@ module Vodpod
     # Creates a new connection. Parameters:
     #
     # :api_key => API key
-    # :auth => Auth key
+    # :auth_key => Auth key
     def initialize(params = {})
       @api_key = params[:api_key]
-      @auth = params[:auth]
+      @auth_key = params[:auth_key]
     end
 
     # Request via GET
@@ -19,11 +19,6 @@ module Vodpod
       request :get, *paths, params
     end
  
-    # Returns a pod by ID.
-    def pod(id)
-      Pod.load(self, 'pod_id' => id)
-    end
-
     # Request via POST
     def post(*paths, params = {})
       request :post, *paths, params
@@ -44,8 +39,7 @@ module Vodpod
       }
 
       # Join path fragments
-      path = Vodpod::BASE_URI + paths.map{|e| Vodpod::escape(e)}.join('/') +
-        '.json'
+      path = Vodpod::BASE_URI + paths.map{|e| Vodpod::escape(e)}.join('/') + '.json'
       
       # Construct query fragment
       query = defaults.merge(params).inject('?') { |s, (k, v)|
@@ -76,39 +70,14 @@ module Vodpod
         raise Error.new("Error retrieving #{uri.path}#{query}: #{e.message}")
       end
 
-        # Parse response as JSON
-        begin
-          data = JSON.parse res
-        rescue => e
-          raise Error, "server returned invalid json: #{e.message}" + "\n\n" + res
-        end
-
-        data
+      # Parse response as JSON
+      begin
+        data = JSON.parse res
+      rescue => e
+        raise Error, "server returned invalid json: #{e.message}" + "\n\n" + res
       end
-    end
 
-    # Searches for videos. Optionally specify :per_page and :page.
-    def search(query, params = {})
-      list = get('video/search', params.merge(:query => query))['videos']['items']
-      return [] unless list
-
-      # Map results to Videos
-      list.map do |item|
-        # These results use Video.1234... as the ID, so we need to strip.
-        store = item['video']
-        store['video_id'] = store['video_id'].sub(/^Video\./, '').to_i
-        Video.new(self, store)
-      end
-    end
-
-    # Returns a user by ID.
-    def user(id)
-      User.new(self, 'user_id' => id)
-    end
-
-    # Returns a video by ID.
-    def video(id)
-      Video.load(self, 'video_id' => id)
+      data
     end
   end
 end

@@ -34,7 +34,7 @@ module Vodpod
   # Creates a connection with the provided parameter hash, and yields it in a
   # block if given. Returns the connection. Example:
   #
-  #   Vodpod.start(:api_key => api_key, :auth => auth) do |v|
+  #   Vodpod.start(:api_key => api_key, :auth_key => auth_key) do |v|
   #     pod = v.pod('aphyr')
   #     p pod.created_at
   #   end

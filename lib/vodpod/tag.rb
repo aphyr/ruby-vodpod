@@ -3,11 +3,11 @@ module Vodpod
   # that I'm aware of, but it might happen in the future.
   class Tag < Record
     def inspect
-      "<Vodpod::Tag #{@store['_value']} (#{count})>"
+      "<Vodpod::Tag #{@store['name']} (#{count})>"
     end
 
     def to_s
-      @store['_value']
+      @store['name']
     end
   end
 end

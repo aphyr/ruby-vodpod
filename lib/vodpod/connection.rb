@@ -15,8 +15,8 @@ module Vodpod
     end
 
     # Request via GET
-    def get(path, params = {})
-      request :get, path, params
+    def get(*paths, params = {})
+      request :get, *paths, params
     end
  
     # Returns a pod by ID.
@@ -25,22 +25,33 @@ module Vodpod
     end
 
     # Request via POST
-    def post(path, params = {})
-      request :post, path, params
+    def post(*paths, params = {})
+      request :post, *paths, params
     end
 
     # Perform a JSON request to the Vodpod API for a given path and parameter
     # hash. Returns a parsed JSON document. Automatically provides api_key and
     # auth params if you do not specify them. Method should be one of :get or
-    # :post--you should use the #get or #post methods for convenience.
-    def request(method, path, params = {})
+    # :post--you should use the #get or #post methods for convenience. Array
+    # values for parameters are joined by commas.
+    #
+    # Example
+    #   request :get, :users, :aphyr, :include => [:name]
+    def request(method, *paths, params = {})
       defaults = {
         :api_key => @api_key,
         :auth => @auth
       }
 
+      # Join path fragments
+      path = Vodpod::BASE_URI + paths.map{|e| Vodpod::escape(e)}.join('/') +
+        '.json'
+      
       # Construct query fragment
       query = defaults.merge(params).inject('?') { |s, (k, v)|
+        if v.kind_of? Array
+          v = v.join(',')
+        end
         s << "#{Vodpod::escape(k)}=#{Vodpod::escape(v)}&"
       }[0..-2]
 
@@ -49,22 +60,30 @@ module Vodpod
         case method
         when :get
           # GET request
-          uri = URI.parse(Vodpod::BASE_URI + path + '.js' + query)
-          JSON.parse Net::HTTP.get(uri)
+          uri = URI.parse(path + query)
+          res = Net::HTTP.get(uri)
         when :post
           # POST request
-          uri = URI.parse(Vodpod::BASE_URI + path + '.js')
+          uri = URI.parse(path)
           res = Net::HTTP.start(uri.host, uri.port) do |http|
-            http.post(uri.path, query[1..-1])
+            http.post(uri.path, query[1..-1]).body
           end
-          JSON.parse res.body
         else
           # Don't know how to do that kind of request
           raise Error.new("Unsupported request method #{method.inspect}; should be one of :get, :post.")
         end
       rescue => e
-        # Error somewhere in the request/parse process.
         raise Error.new("Error retrieving #{uri.path}#{query}: #{e.message}")
+      end
+
+        # Parse response as JSON
+        begin
+          data = JSON.parse res
+        rescue => e
+          raise Error, "server returned invalid json: #{e.message}" + "\n\n" + res
+        end
+
+        data
       end
     end
 

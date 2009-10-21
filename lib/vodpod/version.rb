@@ -1,6 +1,6 @@
 module Vodpod
   APP_NAME = 'Vodpod'
-  APP_VERSION = '0.0.1'
+  APP_VERSION = '2.0.0'
   APP_AUTHOR = 'Kyle Kingsbury'
   APP_EMAIL = 'aphyr@aphyr.com'
   APP_URL = 'http://aphyr.com/projects/ruby-vodpod'

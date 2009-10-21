@@ -50,7 +50,16 @@ module Vodpod
     should 'get users' do
       u = @v.user 'aphyr', :include => :followers
       u.followers.should.not.be.empty
+      u.followers.first.should.be.kind_of User
       u.key.should == 'aphyr'
+    end
+
+    should 'get collections' do
+      c = @v.collection 'aphyr', 'aphyr', :include => :videos
+      c.videos.should.not.be.empty
+      c.videos.first.should.be.kind_of CollectionVideo
+      c.videos_count.should.be > 10
+      c.key.should == 'aphyr'
     end
   end
 end

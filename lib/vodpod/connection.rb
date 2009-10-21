@@ -16,6 +16,11 @@ module Vodpod
       @timeout = params[:timeout] || TIMEOUT
     end
 
+    # Gets a collection by user and collection key.
+    def collection(user, collection, *args)
+      Collection.new self, get(:users, user, :collections, collection, *args)
+    end
+
     # Request via GET
     def get(*args)
       request :get, *args

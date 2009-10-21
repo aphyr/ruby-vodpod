@@ -114,7 +114,7 @@ module Vodpod
       end
 
       # Check for errors
-      if data[0].false?
+      if data[0] == false
         raise Error, data[1]['message']
       end
 

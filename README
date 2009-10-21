@@ -8,6 +8,10 @@ copy videos automatically from a social bookmarking site.  Be creative. :-)
 
 You can search for videos, retrieve users, collections, videos, and their tags and comments. You can filter by tags, sort and paginate every dataset, and generally be awesome.
 
+Source code: http://github.com/aphyr/ruby-vodpod.
+
+Gem: gem install vodpod
+
 Examples
 --------
 

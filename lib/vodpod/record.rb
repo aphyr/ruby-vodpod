@@ -66,6 +66,20 @@ module Vodpod
       self.class == other.class and self.key == other.key rescue false
     end
 
+    def inspect
+      "#<#{self.class} #{key} #{@values.inspect}>"
+    end
+
+    def to_s
+      if respond_to? :title
+        title.to_s
+      elsif respond_to? :name
+        name.to_s
+      else
+        key.to_s
+      end
+    end
+
     # Pass requests to store by default.
     def method_missing(meth, *args)
       if @values.include? meth.to_s

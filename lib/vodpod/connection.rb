@@ -111,5 +111,10 @@ module Vodpod
       # Return data section
       data[1]
     end
+
+    # Retrieves a specific video by key.
+    def video(key, *args)
+      Video.new self, get(:videos, key, *args)
+    end
   end
 end

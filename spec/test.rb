@@ -38,5 +38,13 @@ module Vodpod
     should 'cast datetimes' do
       @v.me(:include => [:created_at]).created_at.should.be.kind_of DateTime
     end
+
+    should 'get videos' do
+      v = @v.video 2336393, :include => :comments
+      v.title.should =~ /Queer and Loathing/
+      v.comments.should.not.be.empty
+      v.comments.first.text.should.not.be.empty
+      v.comments.first.user.should.not.be.nil
+    end
   end
 end

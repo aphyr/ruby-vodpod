@@ -4,6 +4,6 @@ module Vodpod
     date :created_at
     many :tags
     date :updated_at
-    many :videos, :class => CollectionVideo
+    many :videos, :class => 'CollectionVideo'
   end
 end

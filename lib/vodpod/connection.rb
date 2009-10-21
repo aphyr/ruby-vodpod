@@ -123,8 +123,56 @@ module Vodpod
     end
 
     # Retrieves a specific video by key.
-    def video(key, *args)
-      Video.new self, get(:videos, key, *args)
+    # Three senses:
+    #
+    # 1. video(video) => Video
+    # 2. video(user, video) => CollectionVideo
+    # 2. video(user, collection, video) => CollectionVideo
+    #
+    # Which sense is determined by the index of the integer video key, so
+    # you can safely chain calls like:
+    #
+    #   video(123, :comments, :page => 2)
+    #
+    # to get the 2nd page of comments associated with the video.
+    def video(*args)
+      key = args.find { |e| Integer === e }
+      i = args.index(key)
+      
+      case i
+      when 0
+        Video.new self, get(:videos, *args)
+      when 1
+        CollectionVideo.new self, get(:users, args.shift, :videos, *args)
+      when 2 
+        CollectionVideo.new self, get(:users, args.shift, :collections, args.shift, :videos, *args)
+      else
+        raise ArgumentError, "usage: video(video), video(user, video), video(user, collection, video)"
+      end
+    end
+
+    # Gets a list of videos
+    # Three senses:
+    #
+    # 1. videos() => An array of Videos
+    # 2. videos(user) => An array of CollectionVideos
+    # 3. videos(user, collection) => An array of CollectionVideos
+    #
+    # The sense is determined by the number of arguments before a hash (or if
+    # no options hash is given, the number of arguments).
+    def videos(*args)
+      opts = args.find { |e| Hash === e }
+      i = args.index(opts) || args.size
+      case i
+      when 0
+        RecordSet.new self, Video, get(:videos, *args)
+      when 1
+        RecordSet.new self, CollectionVideo, get(:users, args.shift, :videos, *args)
+      when 2
+        RecordSet.new self, CollectionVideo, get(:users, args.shift, :collections, args.shift, :videos, *args)
+      else
+        raise ArgumentError, "usage: videos(), videos(user), videos(user, collection)"
+      end
     end
   end
 end

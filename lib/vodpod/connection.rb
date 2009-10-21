@@ -21,6 +21,11 @@ module Vodpod
       Collection.new self, get(:users, user, :collections, collection, *args)
     end
 
+    # Gets collections belonging to a user.
+    def collections(user, *args)
+      RecordSet.new self, Collection, get(:users, user, :collections, *args)
+    end
+
     # Request via GET
     def get(*args)
       request :get, *args
@@ -115,6 +120,12 @@ module Vodpod
 
       # Return data section
       data[1]
+    end
+
+    # Searches for videos
+    def search(query, opts = {})
+      opts = {:query => query}.merge opts
+      RecordSet.new self, Video, get(:search, opts)
     end
 
     # Gets a user by key

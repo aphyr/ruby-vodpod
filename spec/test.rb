@@ -41,20 +41,27 @@ module Vodpod
 
 
     should 'get a user' do
-      u = @v.user 'aphyr', :include => :followers
+      u = @v.user :aphyr, :include => :followers
       u.followers.should.not.be.empty
       u.followers.first.should.be.kind_of User
       u.key.should == 'aphyr'
     end
 
     should 'get a collection' do
-      c = @v.collection 'aphyr', 'aphyr', :include => :videos
+      c = @v.collection :aphyr, :aphyr, :include => :videos
       c.videos.should.not.be.empty
       c.videos.first.should.be.kind_of CollectionVideo
       c.videos_count.should.be > 10
       c.key.should == 'aphyr'
     end
-    
+   
+    should 'get a users collections' do
+      cs = @v.collections :aphyr
+      cs.should.not.be.empty?
+      cs.first.should.be.kind_of Collection
+      cs.any? { |c| c.key == 'aphyr' }.should.be.true
+    end
+
     should 'get a video' do
       v = @v.video 2336393, :include => :comments
       v.title.should =~ /Queer and Loathing/
@@ -95,6 +102,13 @@ module Vodpod
       vs.each do |v|
         v.tags.any? { |t| t.name == 'awesome' }.should.be.true
       end
+    end
+
+    should 'search for videos' do
+      vs = @v.search 'ultimate frisbee', :include => :tags
+      vs.should.not.be.empty
+      vs.first.should.be.kind_of Video
+      vs.first.tags.should.be.kind_of Array
     end
   end
 end

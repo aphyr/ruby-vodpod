@@ -1,13 +1,9 @@
 module Vodpod
-  # A Tag, attached to a video. There isn't a way yet to go from tags to videos
-  # that I'm aware of, but it might happen in the future.
+  # A Tag, attached to a video.
   class Tag < Record
-    def inspect
-      "<Vodpod::Tag #{@store['name']} (#{count})>"
-    end
-
-    def to_s
-      @store['name']
-    end
+    many :collection_videos, :class => CollectionVideo
+    many :collections
+    many :users
+    many :videos
   end
 end

@@ -15,10 +15,12 @@ module Vodpod
   require "#{ROOT}/vodpod/version"
   require "#{ROOT}/vodpod/error"
   require "#{ROOT}/vodpod/connection"
+  require "#{ROOT}/vodpod/comment"
   require "#{ROOT}/vodpod/record"
   require "#{ROOT}/vodpod/user"
   require "#{ROOT}/vodpod/tag"
   require "#{ROOT}/vodpod/collection"
+  require "#{ROOT}/vodpod/collection_video"
   require "#{ROOT}/vodpod/video"
 
   # Performs URI escaping so that you can construct proper

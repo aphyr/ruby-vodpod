@@ -46,5 +46,11 @@ module Vodpod
       v.comments.first.text.should.not.be.empty
       v.comments.first.user.should.not.be.nil
     end
+
+    should 'get users' do
+      u = @v.user 'aphyr', :include => :followers
+      u.followers.should.not.be.empty
+      u.key.should == 'aphyr'
+    end
   end
 end

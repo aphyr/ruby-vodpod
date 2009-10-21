@@ -112,6 +112,11 @@ module Vodpod
       data[1]
     end
 
+    # Gets a user by key
+    def user(key, *args)
+      User.new self, get(:users, key, *args)
+    end
+
     # Retrieves a specific video by key.
     def video(key, *args)
       Video.new self, get(:videos, key, *args)

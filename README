@@ -3,75 +3,53 @@ Vodpod - Ruby bindings for the Vodpod API.
 
 Vodpod is a web site that allows you to collect videos. This library lets you
 interact with those collections and videos over their REST-style API, using
-clean Ruby. Typically one interacts with the Vodpod API through javascript, but
-maybe you've got bigger plans. Maybe you want to integrate with a content
-management system, or copy videos automatically from a social bookmarking site.
-Be creative. :-)
+clean Ruby. Maybe you want to integrate with a content management system, or
+copy videos automatically from a social bookmarking site.  Be creative. :-)
 
-Right now you can search for videos across the site and in a specific pod,
-retrieve details on videos and pods, and page through videos in a pod. You can
-also post new videos to a pod, and update video attributes. Error handling is
-spotty thus far.
+You can search for videos, retrieve users, collections, videos, and their tags and comments. You can filter by tags, sort and paginate every dataset, and generally be awesome.
 
 Examples
 --------
 
-Vodpod.start(:api_key => '...', :auth => '...') do |v|
-  # Get a pod
-  pod = v.pod('aphyr')
+Vodpod.start(:api_key => '...', :auth_key => '...') do |v|
+  # View the user associated with this API key
+  v.me 
+  #=> #<Vodpod::User spencer {"name"=>"Spencer", "thumbnail"=>"http://s3.amazonaws.com/vodpod.com.users.image/8.medium.jpg", "videos_count"=>670, "description"=>"Co-founder and Engineer at Vodpod", "key"=>"spencer"}>
 
-  # Basic information about a pod is loaded by default
-  pod.name   # => "aphyr's videos" 
-  pod.stats  # => {"total_views"=>23, "weekly_pod_views"=>2, ...}
+  # Attributes are accessed like so...
+  v.me.name #=> "Spencer"
 
-  # Retrieve tags (also works on videos)
-  pod.tags   # => [<Vodpod::Tag neotokyo (1)>, <Vodpod::Tag game (1)>, ...]
+  # Get a user, with some extra attributes
+  v.user :aphyr, :include => [:collections, :followers] 
+  #=> #<Vodpod::User aphyr {"name"=>"aphyr", "collections"=>[#<Vodpod::User aphyr {"name"=>"aphyr's videos", "key"=>"aphyr"}>], "followers"=>[#<Vodpod::User spencer {"name"=>"Spencer", "thumbnail"=>"http://s3.amazonaws.com/vodpod.com.users.image/8.medium.jpg", "key"=>"spencer"}>, #<Vodpod::User pkulak {"name"=>"pkulak", "thumbnail"=>"http://s3.amazonaws.com/vodpod.com.users.image/11221.medium.jpg", "key"=>"pkulak"}>], "thumbnail"=>"http://s3.amazonaws.com/vodpod.com.users.image/493234.medium.jpg", "videos_count"=>69, "description"=>"I'm a developer here at Vodpod. I'm also a freelance photographer, Aikido nut, gamer, book enthusiast, and physics and math geek.", "key"=>"aphyr"}>
 
-  # Look at who's following this pod
-  pod.followers  # => [<Vodpod::User foo>, <Vodpod::User bar>, ...]
+  # Associated objects are automatically instantiated.
+  v.user(:aphyr, :include => :collections).collections
+  # => [#<Vodpod::Collection aphyr {"name"=>"aphyr's videos", "key"=>"aphyr"}>]
 
-  # Get a full dump of an object's contents (works on Tags, Users, Videos, ...)
-  pod.store      # => {"name"=>"aphyr's videos", "created_at" => ...}
+  # You can get more detail about a collection with collection(user_key,
+  # collection_key). Let's build a tag cloud for aphyr's collection named
+  # "aphyr".
+  v.collection(:aphyr, :aphyr, :include => :tags).tags.map { |t| t.count, t.name }
+  # => [[16, "funny"], [12, "awesome"], [6, "music"], [4, "trailer"], [4, "game"], [3, "apple"], [3, "ruby"], [3, "_why"], [3, "math"], [3, "fail"], [3, "robot"], [3, "lego"], [3, "neotokyo"], [2, "future-occupation?"], [2, "microsoft"], [2, "gay"], [2, "cat"], [2, "evil"], [2, "parkour"], [2, "science fiction"]]
 
-  # List some videos
-  pod.videos.map { |video| video.title }
-  # => ["Official Neotokyo Trailer", "Kittens Attack!"]
+  # You can find videos by searching...
+  v.search(:kittens, :limit => 1, :offset => 14).first
+  # => #<Vodpod::Video 29740 {"autoplay_embed"=>"<embed src=\"http://www.youtube.com/v/jn0Fo0Mt6xo&autoplay=1&fs=1&showinfo=0&showsearch=0&rel=0&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" wmode=\"opaque\" width=\"100%\" height=\"100%\" id=\"myytplayer\"></embed>", "total_views"=>77, "created_at"=>#<DateTime: 10602058157/4320,-5/24,2299161>, "title"=>"Samson the Kitten", "video_host"=>{"url"=>"http://www.youtube.com/v/jn0Fo0Mt6xo", "domain"=>"youtube.com", "description"=>"Zachary gets Samson nodding and shaking his head."}, "thumbnail"=>"http://assetscdn.vodpod.com/images/missing_video_100.gif", "down_votes"=>0, "url"=>"http://vodpod.com/watch/29740-samson-the-kitten", "up_votes"=>0, "embed"=>"<embed src=\"http://www.youtube.com/v/jn0Fo0Mt6xo&autoplay=&fs=1&showinfo=0&showsearch=0&rel=0&\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" wmode=\"opaque\" width=\"100%\" height=\"100%\" id=\"myytplayer\"></embed>", "description"=>nil, "key"=>29740}>
 
-  # You can page through results and filter by tags
-  pod.videos(:tags => 'music', :page => 2, :per_page => 16)
-  # => [<Vodpod::Video ...>, <Vodpod::Video ...>, ...]
-
-  # Find videos by searching (Also works on pods)
-  v.search('obama', :per_page => 48)
-  # => [<Vodpod::Video ...>, <Vodpod::Video ...>, ...]
-
-  # Get a specific video by ID
-  vid = v.video(1063027)   # => <Vodpod::Video ...>
+  # Or by tags...
+  v.videos(:tags => ['star trek', :bloopers]).total
+  # => 494
   
-  # Show the associated user
-  vid.user                 # => <Vodpod::User scarrfase>
+  # You can retrieve specific videos if you know their key
+  v.video(29740)
+  # => (same video as from search)
 
-  # Post a new video to a pod. Returns the new video.
-  pod.post('http://www.youtube.com/watch?v=E0ewUBTSlvQ',
-    :title => 'Neotokyo Recon Demo',
-    :description => 'Demo footage of the in-development Neotokyo mod',
-    :tags => ['game', 'neotokyo', 'trailer']
-  )
-  # => <Vodpod::Video ...>
-
-  # Add a tag "sports" to every video in a pod about frisbee.
-  pod.search('frisbee').each do |video|
-    tags = "#{video.tags} sports"
-    video.update(:tags => tags)
-  end
+  # You can also get CollectionVideos--the version of a video belonging to a
+  # specific user/collection.
+  v.videos(:spencer, :electro, :limit => 1).first
+  # => #<Vodpod::CollectionVideo 1002751 {"autoplay_embed"=>"<embed src=\"http://www.youtube.com/v/v-3jOg5QpJo&autoplay=1&fs=1&showinfo=0&showsearch=0&rel=0&autoplay=&border=0&rel=0\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" wmode=\"opaque\" width=\"100%\" height=\"100%\" id=\"myytplayer\"></embed>", "total_views"=>3, "created_at"=>#<DateTime: 42417586163/17280,-5/24,2299161>, "title"=>"Crystal Castles - Knights", "video_host"=>{"url"=>"http://www.pitchforkmedia.com/article/download/145440-video-crystal-castles-knights", "domain"=>"pitchforkmedia.com", "description"=>""}, "thumbnail"=>"http://img.vodpod.com/1002751.medium100.jpg", "down_votes"=>0, "url"=>"http://vodpod.com/watch/1002751-crystal-castles-knights?pod=electro", "up_votes"=>1, "embed"=>"<embed src=\"http://www.youtube.com/v/v-3jOg5QpJo&autoplay=&fs=1&showinfo=0&showsearch=0&rel=0&autoplay=&border=0&rel=0\" type=\"application/x-shockwave-flash\" allowscriptaccess=\"always\" allowfullscreen=\"true\" wmode=\"opaque\" width=\"100%\" height=\"100%\" id=\"myytplayer\"></embed>", "description"=>"", "key"=>1002751}>
 end
 
-Roadmap
--------
-
-- Posting videos seems to work--the URL is correct in the returned video JSON,
-  but visiting the page doesn't seem to load. Perhaps a caching issue on
-  Vodpod's end?
-- Automatic casting for datetimes.
-- Better error handling
-- Iterators for acting on all results without thinking about pagination
+You can contact support@vodpod.com for help with the toolkit. Patches welcome
+on github!
